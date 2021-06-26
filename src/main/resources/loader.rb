@@ -17,12 +17,9 @@ end
 
 module RubyCore
 	class Loader
-		def initialize(ruby_core_instance)
-            @ruby_core_instance = ruby_core_instance
-#             RubyCore::Gems::process_gems([{rubygem: "rubyzip", as: "zip"}])
-		end
 
 		def loader_init
+		    Zip.on_exists_proc = true # We need to rebuild the cache folder every time in case a mod updates
 			@path = RubyCore::Paths.new
 			@gems_folder = @path.gems_folder()
 			@ruby_mods_folder = @path.ruby_mods_folder()
@@ -46,33 +43,37 @@ module RubyCore
 
 		def load_mods
             puts "Loading internal mods"
+            puts File.join(File.dirname(__FILE__), 'mod', 'mod_*.rb')
 			Dir[File.join(File.dirname(__FILE__), 'mod', 'mod_*.rb')].each do |m|
 			    puts "Loading mod #{m}"
 				load m
 			end
 
-
-            jar_mods = []
-		    puts "Loading external mods into cache"
-            Dir[File.join(@mods_folder, '*.jar')].each do |m|
-            puts "Loading mod #{m} into cache"
-                Zip::File.open(m) do |zip_file|
+            puts RubyCoreApi::MOD_ID
+            # We only wanna load external mods if the mod ID is still rubycore. If the developer modifies the mod ID this functionality is disabled.
+            if RubyCoreApi::MOD_ID == 'rubycore'
+                jar_mods = []
+            	puts "Loading external mods into cache"
+                Dir[File.join(@mods_folder, '*.jar')].each do |m|
+                  puts "Loading mod #{m} into cache"
+                  Zip::File.open(m) do |zip_file|
                     zip_file.each do |entry|
-                        next unless entry.to_s.include?('.rb')
-                        jar_mods << zip_file.to_s unless jar_mods.include? zip_file.to_s
+                      next unless entry.to_s.include?('.rb')
+                      jar_mods << zip_file.to_s unless jar_mods.include? zip_file.to_s # Essentially we wanna gather a list of jars that have ruby code in them so we can
+                                                                                                     # Iterate on them later and load in each one.
                     end
+                  end
+                end
+
+                jar_mods.each do |file|
+                  extract_zip(file, @cache_folder)
+                end
+
+                Dir[File.join(@cache_folder, '*.rb')].each do |m|
+                  puts "Loading mod #{m} from cache"
+                  load m
                 end
             end
-
-            jar_mods.each do |file|
-                extract_zip(file, @cache_folder)
-            end
-
-            Dir[File.join(@cache_folder, '*.rb')].each do |m|
-              puts "Loading mod #{m} from cache"
-            load m
-            end
-
 		end
 
 		def initialize_mods
@@ -93,13 +94,15 @@ module RubyCore
     		end
 		end
 
+        # We use this to create a 'cache' that can be loaded by rubycore.
+        # TODO: Find a way around unzipping these
 		def extract_zip(file, destination)
           FileUtils.mkdir_p(destination)
 
           Zip::File.open(file) do |zip_file|
             zip_file.each do |f|
               fpath = File.join(destination, f.name)
-              zip_file.extract(f, fpath) unless File.exist?(fpath)
+              zip_file.extract(f, fpath)
             end
           end
         end

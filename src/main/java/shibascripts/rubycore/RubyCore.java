@@ -58,7 +58,7 @@ public class RubyCore {
             URL url = getClass().getResource("/loader.rb");
             String unescapedurl = URLDecoder.decode(url.toString(), "UTF-8");
             Object brainClass = container.runScriptlet(url.openStream(), unescapedurl);
-            core = container.callMethod(brainClass, "new", instance);
+            core = container.callMethod(brainClass, "new");
             container.callMethod(core, "loader_init");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
