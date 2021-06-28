@@ -6,6 +6,8 @@ require_relative 'forge'
 
 require_relative 'rubycore/paths'
 require_relative 'rubycore/gems'
+require_relative 'rubycore/forge/registry'
+require_relative 'rubycore/forge/ore_block'
 
 def add_mod(mod = nil, name = nil, version = nil)
 	if mod && name && version
@@ -60,7 +62,7 @@ module RubyCore
                     zip_file.each do |entry|
                       next unless entry.to_s.include?('.rb')
                       jar_mods << zip_file.to_s unless jar_mods.include? zip_file.to_s # Essentially we wanna gather a list of jars that have ruby code in them so we can
-                                                                                                     # Iterate on them later and load in each one.
+                                                                                       # Iterate on them later and load in each one.
                     end
                   end
                 end

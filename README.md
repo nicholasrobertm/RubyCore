@@ -1,9 +1,12 @@
 RubyCore
 ========
 
+This Repository is Hosted and mirrored from [gitlab](https://gitlab.com/nicholasrobertm/rubycore).
+All issues and contributions should be made there.
+
 This is an updated & maintained fork of btripoloni's idea found [here](https://github.com/btripoloni/RubyCore)
 
-RubyCore is an easy way to create mods for minecraft using ruby.
+RubyCore is an easy way to create mods for Minecraft using Ruby.
 
 Requirements
 ============
@@ -105,6 +108,8 @@ Please contact me or open and issue, and we can discuss compensation for these b
 ---
 Contributing
 ============
+
+Be sure to contribute your changes against [Gitlab](https://gitlab.com/nicholasrobertm/rubycore).
 
 I'm happily accepting pull requests for this project. Check out current git issues for an idea of the current goals of this project.
 
