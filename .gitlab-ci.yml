@@ -7,8 +7,29 @@ stages:
   - test
   - curseforge
 
+build:
+  stage: build
+  image: gradle:6.8.1-jdk15
+  script:
+    - gradle build
+
+lint-ruby:
+  stage: test
+  image: ruby:2.7.3
+  script:
+    - cd src/main/resources
+    - bundle install
+    - rubocop
+
+test-ruby:
+  stage: test
+  image: ruby:2.7.3
+  script:
+    - cd src/main/resources
+    - bundle install
+    - rspec --pattern spec/**/*_spec.rb
+
 include:
-  - template: Jobs/Build.gitlab-ci.yml  # https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Jobs/Build.gitlab-ci.yml
   - template: Jobs/Test.gitlab-ci.yml  # https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Jobs/Test.gitlab-ci.yml
   - template: Jobs/Code-Quality.gitlab-ci.yml  # https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Jobs/Code-Quality.gitlab-ci.yml
   - template: Jobs/Code-Intelligence.gitlab-ci.yml  # https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Jobs/Code-Intelligence.gitlab-ci.yml

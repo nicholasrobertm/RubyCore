@@ -1,0 +1,23 @@
+GlobalVars:
+  AllowedVariables:
+    - $mods
+
+Layout/LineLength:
+  Max: 200
+
+Metrics/MethodLength:
+  Max: 32
+
+
+Naming/VariableName:
+  Exclude:
+    - rubycore/forge/registry.rb
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
