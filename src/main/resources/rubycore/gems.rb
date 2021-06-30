@@ -7,14 +7,12 @@ module RubyCore
 			unless gems.empty?
 				Gem.paths = {'GEM_HOME' => @path.gems_folder}
 			end
-
 			gems.each {|g| load_gem(g) }
 		end
 
 
 		def self.require_gem(g)
 			if g.is_a?(Hash)
-			    puts "Requiring gem: #{g}"
 				if g[:as]
 					require g[:as]
 				else
@@ -27,24 +25,24 @@ module RubyCore
 
 		def self.load_gem(g)
 			begin
-				puts "REQUIRING GEM #{g}"
 				require_gem(g)
 			rescue LoadError
-			        puts "DOWNLOADING GEM #{g}"
 					download_gems(g)
 				begin
 					require_gem(g)
-				rescue LoadError
+				rescue LoadError => error
 					puts "Sorry but i can't install the #{g[:rubygem]}, sorry :("
+					puts error
+					puts error.inspect
 				end
 			end
 		end
 
 		def self.download_gems(g)
 		    begin
-    			system "java -jar jruby.jar -S gem install --install-dir #{@path.gems_folder} #{g[:rubygem]} --no-document --verbose"
+    			system("java -classpath '#{@path.rubycore_location}' org.jruby.Main -S gem install --install-dir #{@path.gems_folder} #{g[:rubygem]} --no-document --verbose")
 		    rescue StandardError => error
-		        puts File.join(@path.minecraft_folder, 'mods')
+		    	puts "Path: #{@path.rubycore_location}"
                 puts error
                 puts error.inspect
 		    end

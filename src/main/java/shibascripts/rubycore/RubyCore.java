@@ -54,13 +54,16 @@ public class RubyCore {
             container.setClassLoader(RubyCore.class.getClassLoader());
             URL url = getClass().getResource("/loader.rb");
             String unescapedurl = URLDecoder.decode(url.toString(), "UTF-8");
+            LOGGER.warn(container.runScriptlet(url.openStream(), unescapedurl));
             Object brainClass = container.runScriptlet(url.openStream(), unescapedurl);
             core = container.callMethod(brainClass, "new");
             container.callMethod(core, "loader_init");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            LOGGER.error("UnsupportedEncoding Exception");
+            LOGGER.error(e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("IO Exception");
+            LOGGER.error(e.getMessage());
         }
     }
 

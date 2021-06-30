@@ -2,5 +2,6 @@
   "pack": {
     "description": "rubycore resources",
     "pack_format": 6,
+    "_comment": "All the resources used by rubycore"
   }
 }

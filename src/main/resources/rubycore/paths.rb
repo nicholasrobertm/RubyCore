@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'shellwords'
 
 module RubyCore
 	class Paths
@@ -13,6 +14,10 @@ module RubyCore
 		def forge_mods_folder
 			join_path(File.join(minecraft_folder, 'mods'))
 		end
+
+		def rubycore_location
+		   join_path(File.join(minecraft_folder, 'mods', 'rubycore-0.0.1.jar'))
+        end
 
 		def ruby_mods_folder
         	join_path(File.join(rubycore_folder, 'mods'))
@@ -29,6 +34,8 @@ module RubyCore
 		def cache_folder
         	join_path(File.join(rubycore_folder, 'cache'))
         end
+
+
 
 		def exist?(path)
             Dir.exist?(path)

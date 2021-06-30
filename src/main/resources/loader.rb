@@ -1,13 +1,12 @@
 $mods = []
 
 require 'java'
-require 'zip'
-require_relative 'forge'
 
-require_relative 'rubycore/paths'
-require_relative 'rubycore/gems'
-require_relative 'rubycore/forge/registry'
-require_relative 'rubycore/forge/ore_block'
+require 'forge'
+require 'rubycore/paths'
+require 'rubycore/gems'
+require 'rubycore/forge/registry'
+require 'rubycore/forge/ore_block'
 
 def add_mod(mod = nil, name = nil, version = nil)
 	if mod && name && version
@@ -20,8 +19,12 @@ end
 module RubyCore
 	class Loader
 
+        def initialize
+            puts "initialize ran"
+        end
+
 		def loader_init
-		    Zip.on_exists_proc = true # We need to rebuild the cache folder every time in case a mod updates
+		    puts "Loader INIT"
 			@path = RubyCore::Paths.new
 			@gems_folder = @path.gems_folder()
 			@ruby_mods_folder = @path.ruby_mods_folder()
@@ -29,6 +32,8 @@ module RubyCore
 			@cache_folder = @path.cache_folder()
 			@mods = []
 
+            RubyCore::Gems::process_gems([{rubygem: "rubyzip", as: "zip"}])
+            Zip.on_exists_proc = true # We need to rebuild the cache folder every time in case a mod updates, setting this makes extracting allowed to overwrite
 			create_base
 			load_mods
 			initialize_mods

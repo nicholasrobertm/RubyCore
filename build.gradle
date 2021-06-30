@@ -136,13 +136,15 @@ jar {
     }
 }
 
-jar.finalizedBy('reobfJar')
-
 shadowJar {
+    archiveClassifier.set('')
+    dependencies {
+        include(dependency(files('libs/jruby-complete-9.2.jar')))
+    }
 }
 
 reobf {
     shadowJar {} // Tells FG to reobf the file produced by 'shadowJar' task
 }
 
-
+jar.finalizedBy('reobfJar')
