@@ -66,7 +66,10 @@ Currently, there are no plans to support platforms other than Forge.
 Can I use gems?
 ===============
 
-Currently, to prevent a user from having to download jruby it's bundled in at the build phase. As of now I've not found a good way to install gems at runtime with compiled jruby.
+Technically it's possible to download gems via the same line found in loader.rb
+- RubyCore::Gems::process_gems([{rubygem: "rubyzip", as: "zip"}])
+
+This uses ruby's `system` call to call jruby from within the built rubycore jar. This implementation isn't 100% ideal to happen for users at runtime, but does allow for you to bundle gems with your jar if needed. 
 
 RubyCore does make use of the rubyzip gem, which is why you'll find a modified version of jruby in libs/
 This was done essentially following the below steps:
