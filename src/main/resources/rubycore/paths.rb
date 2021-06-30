@@ -16,7 +16,7 @@ module RubyCore
 		end
 
 		def rubycore_location
-		   join_path(File.join(minecraft_folder, 'mods', 'rubycore-0.0.1.jar'))
+		   join_path(File.join(minecraft_folder, 'mods', 'rubycore-0.0.2.jar'))
         end
 
 		def ruby_mods_folder

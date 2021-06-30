@@ -25,16 +25,16 @@ displayName="RubyCore" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification <here>
 #updateJSONURL="http://myurl.me/" #optional
 # A URL for the "homepage" for this mod, displayed in the mod UI
-#displayURL="http://example.com/" #optional
+displayURL="https://gitlab.com/nicholasrobertm/rubycore" #optional
 # A file name (in the root of the mod JAR) containing a logo for display
-#logoFile="rubycore.png" #optional
+logoFile="rubylogo.png" #optional
 # A text field displayed in the mod UI
-#credits="Thanks for this example mod goes to Java" #optional
+credits="Thanks to btripoloni for the original version oft his mod (all the way back in 1.7.10), and to the JRuby and Ruby communities for their support!" #optional
 # A text field displayed in the mod UI
-#authors="Love, Cheese and small house plants" #optional
+authors="primerib" #optional
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-
+A Mod / Library used to load Ruby code, mainly for making Ruby Mods!
 '''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.rubycore]] #optional
