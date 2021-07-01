@@ -1,6 +1,7 @@
 image: alpine:latest
 
 variables:
+  RUBYCORE_VERSION: 0.0.2
 
 stages:
   - build
@@ -11,7 +12,11 @@ build:
   stage: build
   image: gradle:6.8.1-jdk15
   script:
-    - gradle build
+    - echo "Building $RUBYCORE_VERSION"
+    - gradle build -Pversion=$RUBYCORE_VERSION
+  artifacts:
+    paths:
+      - build/libs/rubycore-$RUBYCORE_VERSION.jar
 
 lint-ruby:
   stage: test
