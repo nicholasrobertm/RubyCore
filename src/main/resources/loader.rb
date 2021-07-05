@@ -59,7 +59,7 @@ module RubyCore
       end
 
       puts RubyCoreApi::MOD_ID
-      # We only wanna load external mods if the mod ID is still rubycore. If the developer modifies the mod ID this functionality is disabled.
+      # We only wanna load external mods if the mod ID is still rubycore. If the developer modifies the mod ID the functionality below this is disabled.
       return unless RubyCoreApi::MOD_ID == 'rubycore'
 
       jar_mods = []
