@@ -17,13 +17,13 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle'
 
 group = 'shibascripts'
-version = '0.0.2'
+version = '0.0.3'
 archivesBaseName = 'rubycore'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8) // Mojang ships Java 8 to end users, so your mod should target Java 8.
 
 minecraft {
-    mappings channel: 'snapshot', version: '20210309-1.16.5'
+    mappings channel: "official", version: "1.16.5"
 
     runs {
         client {

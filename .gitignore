@@ -30,6 +30,8 @@ atlassian-ide-plugin.xml
 *.tar.gz
 *.rar
 
+src/main/resources/rubycore/scripts/*.csv
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 

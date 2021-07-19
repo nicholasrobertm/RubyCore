@@ -1,28 +1,39 @@
 # frozen_string_literal: true
 
-$mods = []
-
 require 'java'
 
+require 'common'
 require 'forge'
 require 'rubycore/paths'
 require 'rubycore/gems'
+RubyCore::Gems.process_gems([{ rubygem: 'rubyzip', as: 'zip' }])
 require 'rubycore/forge/registry'
 require 'rubycore/forge/ore_block'
+require 'rubycore/patches/string'
+# require 'rubycore/scripts/forge_mappings_generator'
 
-def add_mod(mod = nil, name = nil, version = nil)
-  if mod && name && version
-    $mods << mod
-  else
-    puts 'You need to define a mod class a name and the version of the mod![mod not loaded]'
-  end
+if defined?(Material::field_151576_e)
+  require 'rubycore/forge/mappings/abstractblock'
+  require 'rubycore/forge/mappings/material'
+  require 'rubycore/forge/mappings/itemgroup'
+  require 'rubycore/forge/mappings/item'
 end
 
 module RubyCore
   # Used to load in all the ruby mods
+
   class Loader
     def initialize
-      puts 'initialize ran'
+      @@mods = []
+    end
+
+    def self.add_mod(mod = nil, name = nil, version = nil)
+      puts "Adding mod #{name}"
+      if mod && name && version
+        @@mods << mod
+      else
+        puts 'You need to define a mod class a name and the version of the mod![mod not loaded]'
+      end
     end
 
     def loader_init
@@ -34,7 +45,9 @@ module RubyCore
       @cache_folder = @path.cache_folder
       @mods = []
 
-      RubyCore::Gems.process_gems([{ rubygem: 'rubyzip', as: 'zip' }])
+      # run_generators # Should be commented out with the require above when built. Just a hack for generating mappings
+
+
       Zip.on_exists_proc = true # We need to rebuild the cache folder every time in case a mod updates, setting this makes extracting allowed to overwrite
       create_base
       load_mods
@@ -51,12 +64,6 @@ module RubyCore
     end
 
     def load_mods
-      puts 'Loading internal mods'
-      puts File.join(File.dirname(__FILE__), 'mod', 'mod_*.rb')
-      Dir[File.join(File.dirname(__FILE__), 'mod', 'mod_*.rb')].each do |m|
-        puts "Loading mod #{m}"
-        load m
-      end
 
       puts RubyCoreApi::MOD_ID
       # We only wanna load external mods if the mod ID is still rubycore. If the developer modifies the mod ID the functionality below this is disabled.
@@ -65,30 +72,48 @@ module RubyCore
       jar_mods = []
       puts 'Loading external mods into cache'
       Dir[File.join(@mods_folder, '*.jar')].each do |m|
-        puts "Loading mod #{m} into cache"
-        Zip::File.open(m) do |zip_file|
-          zip_file.each do |entry|
-            next unless entry.to_s.include?('.rb')
-
-            jar_mods << zip_file.to_s unless jar_mods.include? zip_file.to_s
-            # Iterate on them later and load in each one.
+        if m.include? 'rubycore'
+          puts "Loading rubycore example mod into the cache"
+          Zip::File.open(m) do |zip_file|
+            zip_file.each do |entry|
+              next unless entry.to_s.include?('.rb')
+              next unless entry.to_s.include?('mod_')
+              FileUtils.mkdir_p(File.dirname(File.absolute_path(@cache_folder + '/rubycore/' + entry.to_s.split('/')[-1])))
+              entry.extract(@cache_folder + '/rubycore/' + entry.to_s.split('/')[-1])
+              # Iterate on them later and load in each one.
+            end
+          end
+        else
+          puts "Loading mod #{m} into cache"
+          Zip::File.open(m) do |zip_file|
+            zip_file.each do |entry|
+              next unless entry.to_s.include?('.rb')
+              jar_mods << zip_file.to_s unless jar_mods.include? zip_file.to_s
+              # Iterate on them later and load in each one.
+            end
           end
         end
       end
 
       jar_mods.each do |file|
-        extract_zip(file, @cache_folder)
+        extract_zip(file, @cache_folder + "/#{File.basename(file.to_s.split('/')[-1], '.jar')}")
       end
 
-      Dir[File.join(@cache_folder, '*.rb')].each do |m|
+      puts "Loading mods"
+      puts Dir[@cache_folder + '/*']
+      Dir[@cache_folder + '/*'].each do |m|
         puts "Loading mod #{m} from cache"
-        load m
+        Dir[File.join(m, 'mod_*.rb')].each do |mod|
+          load mod
+        end
       end
+
     end
 
     def initialize_mods
       puts 'Initializing mods...'
-      $mods.each do |mod|
+      puts @mods
+      @@mods.each do |mod|
         puts "Initializing mod #{mod}"
         @mods << mod.new
       end
@@ -116,6 +141,16 @@ module RubyCore
         end
       end
     end
+
+    # Temporary hack to Generate Method / Variable class mapping. Will go away after 1.17 when everything no longer has to use internal map names.
+    # Only ran when needed locally then manually copied to src/main/resources
+    def run_generators
+      @generator = MappingsGenerator.new('AbstractBlock::Properties',  @path.cache_folder + '/rubycore/scripts', @path.cache_folder + '/output')
+      @generator = MappingsGenerator.new('Material',  @path.cache_folder + '/rubycore/scripts', @path.cache_folder + '/output')
+      @generator = MappingsGenerator.new('Item::Properties',  @path.cache_folder + '/rubycore/scripts', @path.cache_folder + '/output')
+      @generator = MappingsGenerator.new('ItemGroup',  @path.cache_folder + '/rubycore/scripts', @path.cache_folder + '/output')
+    end
+
   end
 end
 

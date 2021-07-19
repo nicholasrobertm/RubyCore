@@ -2,15 +2,15 @@
 
 # Class used to hold all the minecraft registries
 class Registry
-  def initialize
-    @BIOMES = DeferredRegister.create(ForgeRegistries::BIOMES, RubyCoreApi::MOD_ID)
-    @BLOCKS = DeferredRegister.create(ForgeRegistries::BLOCKS, RubyCoreApi::MOD_ID)
-    @ENCHANTMENTS = DeferredRegister.create(ForgeRegistries::ENCHANTMENTS, RubyCoreApi::MOD_ID)
-    @ITEMS = DeferredRegister.create(ForgeRegistries::ITEMS, RubyCoreApi::MOD_ID)
-    @POTION_TYPES = DeferredRegister.create(ForgeRegistries::POTION_TYPES, RubyCoreApi::MOD_ID)
-    @POTIONS = DeferredRegister.create(ForgeRegistries::POTIONS, RubyCoreApi::MOD_ID)
-    @SOUND_EVENTS = DeferredRegister.create(ForgeRegistries::SOUND_EVENTS, RubyCoreApi::MOD_ID)
-    # VILLAGER_PROFESSIONS = DeferredRegister.create(ForgeRegistries::VILLAGER_PROFESSIONS, RubyCoreApi::MOD_ID)
+  def initialize(mod_id = RubyCoreApi::MOD_ID)
+    @BIOMES = DeferredRegister.create(ForgeRegistries::BIOMES, mod_id)
+    @BLOCKS = DeferredRegister.create(ForgeRegistries::BLOCKS, mod_id)
+    @ENCHANTMENTS = DeferredRegister.create(ForgeRegistries::ENCHANTMENTS, mod_id)
+    @ITEMS = DeferredRegister.create(ForgeRegistries::ITEMS, mod_id)
+    @POTION_TYPES = DeferredRegister.create(ForgeRegistries::POTION_TYPES, mod_id)
+    @POTIONS = DeferredRegister.create(ForgeRegistries::POTIONS, mod_id)
+    @SOUND_EVENTS = DeferredRegister.create(ForgeRegistries::SOUND_EVENTS, mod_id)
+    # VILLAGER_PROFESSIONS = DeferredRegister.create(ForgeRegistries::VILLAGER_PROFESSIONS, mod_id)
   end
 
   def post_initialize
