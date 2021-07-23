@@ -1,38 +1,36 @@
 package shibascripts.rubycore;
 
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.material.Material;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraftforge.client.model.generators.BlockStateProvider;
+import com.mojang.datafixers.util.Pair;
+import net.minecraft.client.Minecraft;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.EventBus;
+import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ExtensionPoint;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.network.FMLNetworkConstants;
+import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import shibascripts.rubycore.api.*;
-import net.minecraft.block.Block;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jruby.embed.ScriptingContainer;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.stream.Collectors;
-
-import static java.lang.Thread.sleep;
+import java.util.function.Consumer;
 
 @Mod(RubyCoreApi.MOD_ID)
 public class RubyCore {
@@ -40,16 +38,12 @@ public class RubyCore {
     private static final Logger LOGGER = LogManager.getLogger();
 
     public static RubyCore instance;
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, RubyCoreApi.MOD_ID);
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, RubyCoreApi.MOD_ID);
 
     static ScriptingContainer container = new ScriptingContainer();
     private static Object core = null;
 
     public RubyCore() {
         instance = this;
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-
         try {
             container.setClassLoader(RubyCore.class.getClassLoader());
             URL url = getClass().getResource("/loader.rb");
@@ -65,10 +59,12 @@ public class RubyCore {
             LOGGER.error("IO Exception");
             LOGGER.error(e.getMessage());
         }
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
-    private void setup(final FMLCommonSetupEvent event) {
-
+    @SubscribeEvent
+    public void subscribeEvents(Event event){
+        container.callMethod(core, "process_event", event);
     }
 
 }

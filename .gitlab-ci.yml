@@ -1,7 +1,7 @@
 image: alpine:latest
 
 variables:
-  RUBYCORE_VERSION: 0.0.3
+  RUBYCORE_VERSION: 0.0.4
 
 stages:
   - build
@@ -21,6 +21,7 @@ build:
 lint-ruby:
   stage: test
   image: ruby:2.7.3
+
   script:
     - cd src/main/resources
     - bundle install

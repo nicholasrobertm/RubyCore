@@ -4,6 +4,8 @@ require 'java'
 
 require 'common'
 require 'forge'
+require 'rubycore/forge/api'
+require 'client' if RubyCore::API.is_client?
 require 'rubycore/paths'
 require 'rubycore/gems'
 RubyCore::Gems.process_gems([{ rubygem: 'rubyzip', as: 'zip' }])
@@ -16,7 +18,7 @@ if defined?(Material::field_151576_e)
   require 'rubycore/forge/mappings/abstractblock'
   require 'rubycore/forge/mappings/material'
   require 'rubycore/forge/mappings/itemgroup'
-  require 'rubycore/forge/mappings/item'
+  require 'rubycore/forge/mappings/item' if RubyCore::API.is_client?
 end
 
 module RubyCore
@@ -99,7 +101,7 @@ module RubyCore
         extract_zip(file, @cache_folder + "/#{File.basename(file.to_s.split('/')[-1], '.jar')}")
       end
 
-      puts "Loading mods"
+      puts "Loading mods from cache"
       puts Dir[@cache_folder + '/*']
       Dir[@cache_folder + '/*'].each do |m|
         puts "Loading mod #{m} from cache"
@@ -108,11 +110,16 @@ module RubyCore
         end
       end
 
+      puts "Loading ruby scripts"
+      Dir[File.join(@ruby_mods_folder, 'mod_*.rb')].each do |mod|
+        load mod
+      end
+
     end
 
     def initialize_mods
       puts 'Initializing mods...'
-      puts @mods
+      puts @@mods
       @@mods.each do |mod|
         puts "Initializing mod #{mod}"
         @mods << mod.new
@@ -122,8 +129,8 @@ module RubyCore
     def call_method(name, args = nil)
       @mods.each_with_index do |mod, index|
         if args
-          mod.send(name.to_s, args) if $mods[index].method_defined? name
-        elsif $mods[index].method_defined? name
+          mod.send(name.to_s, args) if @@mods[index].method_defined? name
+        elsif @@mods[index].method_defined? name
           mod.send(name.to_s)
         end
       end
@@ -140,6 +147,10 @@ module RubyCore
           zip_file.extract(f, fpath)
         end
       end
+    end
+
+    def process_event(event)
+        call_method('process_event', event)
     end
 
     # Temporary hack to Generate Method / Variable class mapping. Will go away after 1.17 when everything no longer has to use internal map names.
