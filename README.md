@@ -6,7 +6,7 @@ All issues and contributions should be made there.
 
 This is an updated & maintained fork of btripoloni's idea found [here](https://github.com/btripoloni/RubyCore)
 
-RubyCore is an easy way to create mods for Minecraft using Ruby.
+RubyCore is an easy way to create mods / plugins for Minecraft using Ruby.
 
 Requirements
 ============
@@ -19,22 +19,27 @@ Caveats
 =======
 
 Currently, due to JRuby (What's used to interpret the ruby code from java) not supporting annotations on ruby functions or classes you're still required to have your mod annotation on the java side.
-Additionally, the lack of annotations makes @SubscribeEvent annotations not work 100% from the ruby side, so if you need to use these you should ensure to have the java end call the ruby methods. 
-This may be built in to do this automatically when the functions exist on the ruby end in the future.
+Additionally, the lack of annotations makes @SubscribeEvent annotations not work 100% from the ruby side, so if you need to use these you should ensure to have either:
+- Java code in your mod doing similar to what RubyCore.java does, calling your ruby code from the java end
+- Define a process_event(event) function in your mod / script. RubyCore will pass events from forge to your function for you to handle.
 
-External mods(Jars without RubyCore in them that are built with ruby code in the resources, and put in the mods folder) end up having to be copied into the 'cache' folder (This happens automatically when RubyCore is loading). Currently, there is no known way to load these from the jar in memory.
+Both Internal and External mods (found in the 'mod' folder or copied in from external jars) are copied into the 'cache' folder in rubycore. 
+There is no known way around this currently as you need a file to call ruby's `load` function against.
 
-If you wish to not have these files be easily editable you should instead clone this repo and change the mod ID (outlined below)
+Avoid system/exec/backticks calls. Spawning a sub-ruby in jruby can cause negative performance and should be avoided when possible.
 
 #Getting started:
 
-RubyCore is written to allow you to write a mod one of two ways. These include:
+RubyCore is written to allow you to write a mod / plugin in a few ways. These include:
+  
+* Create a standard forge project in Intellij, setup your mods.toml and annotation in your main class then create a file named `mod_yourmodname.rb` in `src/main/resources` Use this file as the base of your mod / plugin.   
+    * When you put this external mod in your mods folder and have RubyCore there as well, 
+      RubyCore will scan for existence of the mod_*.rb file, copy them to `rubycore/cache` on the client / server and load the files in.
+
+* Create a script directly in the `rubycore/scripts` directory. It will be loaded in straight from there
 
 * Cloning this repo, changing the mod ID in `src/main/java/shibascripts/rubycore/api/RubyCoreApi.java` and the mods.toml. Then adding any of your ruby code in `src/main/resources/mod`. You must follow the mod_*.rb syntax for your main mod file.
-    * **Note**: Doing this disables the loading of external mods (Ruby code bundled in jars in the /mods folder)
-  
-* Leaving RubyCore un-modified. Create a standard forge project in Intellij, setup your mods.toml and annotation in your main class then create a file named `mod_yourmodname.rb` in `src/main/resources`
-    * When you put this external mod in your mods folder and have RubyCore there as well, RubyCore will scan for existance of the mod_*.rb file, copy them to `rubycore/cache` on the client / server and load the files in.
+  * **Note**: Doing this disables the loading of external mods (Ruby code bundled in jars in the /mods folder)
 
 Once you've done either of these you can run gradle build to get your jar like you would normally.
 
@@ -42,26 +47,30 @@ Once you've done either of these you can run gradle build to get your jar like y
 Create a mod using RubyCore is easy
 ===================================
 
-Check out `src/resources/mod/mod_example.rb` for an example of how to do various mod-related things in Ruby.
+Check out `src/resources/examples` or https://gitlab.com/nicholasrobertm/gems for some example mod / plugin implementations.
 
 JRuby (the interpreter that executes the Ruby Code) automatically converts things like Objects and function names to a Ruby happy format.
 
 Example of a block in Ruby:
 @ruby_block = Block.new(AbstractBlock::Properties.create(Material::ROCK).hardness_and_resistance(3, 10).harvest_level(2))
 
+Additionally this project uses Mojmaps and has a class for generating ruby versions of the mappings which then are modified and included in `src/main/resources/rubycore/forge/mappings`
+
 ---
 FAQ
 ===
 
-What type of mods can I create?
+What type of mods / plugins can I create?
 ===============================
 
-You can access all Java, Minecraft, and Forge APIs using Ruby, so you can create whatever you'd like! This project will have some helper classes that wrap the Forge APIs (see what's under 'resources/production' ) so check those out as well.
+You can access all Java, Minecraft, and Forge APIs using Ruby, so you can create whatever you'd like! This project will have some helper classes that wrap the Forge APIs (see what's under the 'rubycore' folder in `src/main/resources`) so check those out as well.
 
 Fabric / Sponge / Spigot support?
 =================================
 
-Currently, there are no plans to support platforms other than Forge.
+I am currently working toward porting the bare minimum 'loader' portion to be generic. This will allow implementation of any API.
+
+Wrapper classes are currently only being written with Forge in mind, if you'd like to contribute Fabric or Spigot supported wrapper classes, feel free to create a Merge request!
 
 Can I use gems?
 ===============
@@ -69,7 +78,10 @@ Can I use gems?
 Technically it's possible to download gems via the same line found in loader.rb
 - RubyCore::Gems::process_gems([{rubygem: "rubyzip", as: "zip"}])
 
-This uses ruby's `system` call to call jruby from within the built rubycore jar. This implementation isn't 100% ideal to happen for users at runtime, but does allow for you to bundle gems with your jar if needed. 
+This must be done at the top where 'require' is, otherwise they won't be available to the running program.
+
+This uses ruby's `system` call to spawn a sub-ruby process from jruby within the built rubycore jar. 
+This implementation isn't 100% ideal as downloading things during runtime isn't great, and sub-ruby processes when use can have performance issues (though you likely won't see it since this would only happen on startup once)
 
 RubyCore does make use of the rubyzip gem, which is why you'll find a modified version of jruby in libs/
 This was done essentially following the below steps:
