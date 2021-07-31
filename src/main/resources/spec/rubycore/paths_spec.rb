@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../../rubycore/paths'
+require_relative '../../rubycore/forge/paths'
 
 describe RubyCore::Paths do
   before(:each) do
