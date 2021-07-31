@@ -25,7 +25,7 @@ lint-ruby:
   script:
     - cd src/main/resources
     - bundle install
-    - rubocop
+    - rubocop --fail-level error
 
 test-ruby:
   stage: test
