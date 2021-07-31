@@ -1,22 +1,12 @@
 package shibascripts.rubycore.api;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.fml.loading.FMLPaths;
-
 
 public class RubyCoreApi {
 
     public static final String MOD_ID = "rubycore";
-
-    public static File minecraft_home(){
-        return FMLPaths.GAMEDIR.get().toFile();
-    }
-
-    public static File rubycore_home() { return FMLPaths.GAMEDIR.get().resolve(MOD_ID).toFile(); }
+    public static final String MOD_VERSION = "0.0.5";
 
     public static Method[] get_methods_from_a_class(String name) throws ClassNotFoundException{
         Class<?> cls = Class.forName(name);

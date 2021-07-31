@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+java_import 'net.minecraftforge.fml.loading.FMLPaths'
 require 'fileutils'
 require 'shellwords'
 
@@ -7,11 +8,11 @@ module RubyCore
   # Gets various paths common to mod installs
   class Paths
     def minecraft_folder
-      RubyCoreApi.minecraft_home.to_s
+      FMLPaths::GAMEDIR.get().to_file().to_s
     end
 
     def rubycore_folder
-      RubyCoreApi.rubycore_home.to_s
+      FMLPaths::GAMEDIR.get().resolve(RubyCoreApi::MOD_ID).to_file().to_s
     end
 
     def forge_mods_folder
@@ -19,7 +20,7 @@ module RubyCore
     end
 
     def rubycore_location
-      join_path(File.join(minecraft_folder, 'mods', 'rubycore-0.0.4.jar'))
+      join_path(File.join(minecraft_folder, 'mods', "#{RubyCoreApi::MOD_ID}-#{RubyCoreApi::MOD_VERSION}"))
     end
 
     def ruby_mods_folder

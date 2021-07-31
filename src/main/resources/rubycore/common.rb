@@ -1,3 +1,4 @@
+# Things to include on both the client and the server
 require 'java'
 
 java_import 'java.util.function.Function'

@@ -1,4 +1,5 @@
 class String
+  # Used to convert from java camel case e.g. myVariableHere to my_variable_here
   def underscore
     self.gsub(/::/, '/').
     gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').

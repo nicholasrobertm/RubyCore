@@ -2,24 +2,15 @@
 
 require 'java'
 
-require 'common'
-require 'forge'
-require 'rubycore/forge/api'
-require 'client' if RubyCore::API.is_client?
-require 'rubycore/paths'
+require 'rubycore/common'
+require 'rubycore/patches/string'
 require 'rubycore/gems'
 RubyCore::Gems.process_gems([{ rubygem: 'rubyzip', as: 'zip' }])
-require 'rubycore/forge/registry'
-require 'rubycore/forge/ore_block'
-require 'rubycore/patches/string'
-# require 'rubycore/scripts/forge_mappings_generator'
 
-if defined?(Material::field_151576_e)
-  require 'rubycore/forge/mappings/abstractblock'
-  require 'rubycore/forge/mappings/material'
-  require 'rubycore/forge/mappings/itemgroup'
-  require 'rubycore/forge/mappings/item' if RubyCore::API.is_client?
-end
+require 'rubycore/api'
+require 'rubycore/forge/forge'
+require 'rubycore/paths'
+
 
 module RubyCore
   # Used to load in all the ruby mods
@@ -75,7 +66,6 @@ module RubyCore
       puts 'Loading external mods into cache'
       Dir[File.join(@mods_folder, '*.jar')].each do |m|
         if m.include? 'rubycore'
-          puts "Loading rubycore example mod into the cache"
           Zip::File.open(m) do |zip_file|
             zip_file.each do |entry|
               next unless entry.to_s.include?('.rb')
