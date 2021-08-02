@@ -146,10 +146,19 @@ module RubyCore
     # Temporary hack to Generate Method / Variable class mapping. Will go away after 1.17 when everything no longer has to use internal map names.
     # Only ran when needed locally then manually copied to src/main/resources
     def run_generators
-      @generator = MappingsGenerator.new('AbstractBlock::Properties',  @path.cache_folder + '/rubycore/scripts', @path.cache_folder + '/output')
-      @generator = MappingsGenerator.new('Material',  @path.cache_folder + '/rubycore/scripts', @path.cache_folder + '/output')
-      @generator = MappingsGenerator.new('Item::Properties',  @path.cache_folder + '/rubycore/scripts', @path.cache_folder + '/output')
-      @generator = MappingsGenerator.new('ItemGroup',  @path.cache_folder + '/rubycore/scripts', @path.cache_folder + '/output')
+      if RubyCore::API.is_client?
+        @generator = MappingsGenerator.new('AbstractBlock::Properties',  @path.cache_folder + '/rubycore/scripts', @path.cache_folder + '/output')
+        @generator = MappingsGenerator.new('Material',  @path.cache_folder + '/rubycore/scripts', @path.cache_folder + '/output')
+        @generator = MappingsGenerator.new('Item::Properties',  @path.cache_folder + '/rubycore/scripts', @path.cache_folder + '/output')
+        @generator = MappingsGenerator.new('ItemGroup',  @path.cache_folder + '/rubycore/scripts', @path.cache_folder + '/output')
+      else
+        @generator = MappingsGenerator.new('NetworkManager',  @path.cache_folder + '/rubycore/scripts', @path.cache_folder + '/output')
+        @generator = MappingsGenerator.new('ServerPlayNetHandler',  @path.cache_folder + '/rubycore/scripts', @path.cache_folder + '/output')
+        @generator = MappingsGenerator.new('ServerPlayerEntity',  @path.cache_folder + '/rubycore/scripts', @path.cache_folder + '/output')
+        @generator = MappingsGenerator.new('MinecraftServer',  @path.cache_folder + '/rubycore/scripts', @path.cache_folder + '/output')
+        @generator = MappingsGenerator.new('Commands',  @path.cache_folder + '/rubycore/scripts', @path.cache_folder + '/output')
+
+      end
     end
 
   end

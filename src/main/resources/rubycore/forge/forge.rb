@@ -9,12 +9,22 @@ java_import 'net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext'
 java_import 'net.minecraftforge.fml.loading.FMLEnvironment'
 
 require 'rubycore/forge/client' if RubyCore::API.is_client?
+require 'rubycore/forge/server' unless RubyCore::API.is_client?
 require 'rubycore/forge/registry'
 require 'rubycore/forge/ore_block'
 # require 'rubycore/scripts/forge_mappings_generator'
+
 if defined?(Material::field_151576_e)
   require 'rubycore/forge/mappings/abstractblock'
   require 'rubycore/forge/mappings/material'
   require 'rubycore/forge/mappings/itemgroup'
   require 'rubycore/forge/mappings/item' if RubyCore::API.is_client?
+end
+
+unless RubyCore::API.is_client?
+  require 'rubycore/forge/mappings/networkmanager'
+  require 'rubycore/forge/mappings/serverplayerentity'
+  require 'rubycore/forge/mappings/serverplaynethandler'
+  require 'rubycore/forge/mappings/minecraftserver'
+  require 'rubycore/forge/mappings/commands'
 end
